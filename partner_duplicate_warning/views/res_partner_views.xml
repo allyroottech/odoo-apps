@@ -1,0 +1,45 @@
+<odoo>
+    <record id="view_partner_form_duplicate_warning" model="ir.ui.view">
+        <field name="name">res.partner.form.duplicate.warning</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='warning_tax']" position="after">
+                <div class="alert alert-warning oe_edit_only" role="alert" name="warning_duplicate_contact"
+                     invisible="not same_email_partner_id and not same_phone_partner_id">
+                    Potential duplicate contact:
+                    <span invisible="not same_email_partner_id or same_phone_partner_id">
+                        <field name="same_email_partner_id" context="{'show_address': False, 'show_vat': False}"/> (Same Email)
+                    </span>
+                    <span invisible="same_email_partner_id or not same_phone_partner_id">
+                        <field name="same_phone_partner_id" context="{'show_address': False, 'show_vat': False}"/> (Same Phone)
+                    </span>
+                    <span invisible="not (same_email_partner_id and same_phone_partner_id and same_email_partner_id == same_phone_partner_id)">
+                        <field name="same_email_partner_id" context="{'show_address': False, 'show_vat': False}"/> (Same Email and Phone)
+                    </span>
+                    <span invisible="not (same_email_partner_id and same_phone_partner_id and same_email_partner_id != same_phone_partner_id)">
+                        <field name="same_email_partner_id" context="{'show_address': False, 'show_vat': False}"/> (Same Email) and
+                        <field name="same_phone_partner_id" context="{'show_address': False, 'show_vat': False}"/> (Same Phone)
+                    </span>
+                </div>
+                <div class="alert alert-warning oe_edit_only" role="alert" name="warning_similar_email_contact"
+                     invisible="not similar_email_partner_id">
+                    Possible typo - similar email found:
+                    <field name="similar_email_partner_id" context="{'show_address': False, 'show_vat': False}"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_res_partner_filter_duplicate_warning" model="ir.ui.view">
+        <field name="name">res.partner.select.duplicate.warning</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="after">
+                <filter string="Potential Duplicates" name="potential_duplicates"
+                        domain="['|', '|', ('same_email_partner_id', '!=', False), ('same_phone_partner_id', '!=', False), ('similar_email_partner_id', '!=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

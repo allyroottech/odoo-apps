@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">Partner Duplicate Warning</title>
+  <defs>
+    <linearGradient id="background" x1="24" y1="20" x2="232" y2="236" gradientUnits="userSpaceOnUse"><stop stop-color="#1a3ff0"/><stop offset="1" stop-color="#04124b"/></linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="48" fill="url(#background)"/>
+  <circle cx="105" cy="104" r="39" fill="#fff"/>
+  <path d="M44 193c7-39 31-61 61-61s54 22 61 61" fill="#fff"/>
+  <circle cx="168" cy="151" r="44" fill="#4b6cff" stroke="#fff" stroke-width="10"/>
+  <path d="M168 126v30M168 176h.1" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="10"/>
+</svg>
