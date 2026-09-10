@@ -1,0 +1,106 @@
+<odoo>
+    <record id="sale_order_ready_to_invoice_kanban_view" model="ir.ui.view">
+        <field name="name">sale.order.kanban.ready.to.invoice</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" sample="1" quick_create="false">
+                <field name="currency_id"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex align-items-baseline mb-2">
+                            <field name="partner_id" class="fw-bolder fs-5 me-2"/>
+                            <field name="amount_total" widget="monetary" class="fw-bolder ms-auto flex-shrink-0"/>
+                        </div>
+                        <div class="text-muted mb-1">
+                            <field name="name"/>
+                        </div>
+                        <footer class="align-items-end">
+                            <div class="d-flex flex-wrap gap-1 text-muted text-nowrap">
+                                <span>Delivered</span>
+                                <field name="fully_delivery_date" widget="remaining_days"/>
+                            </div>
+                            <field name="user_id" widget="many2one_avatar_user" class="ms-auto"/>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="sale_order_ready_to_invoice_action" model="ir.actions.act_window">
+        <field name="name">Ready to Invoice</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="sale.sale_order_view_search_inherit_sale"/>
+        <!-- Hard domain, not just a default filter: this app must always be
+             scoped to the "pending" pipeline - fully delivered, still
+             unbilled - and never show anything outside it (an invoiced
+             order, or one not yet delivered), no matter what happens to the
+             search bar. The 7+ day aging cutoff is intentionally NOT baked
+             in here: it's the removable filter below, so removing it has a
+             real, visible effect (surfaces the not-yet-urgent ones too)
+             instead of being a no-op label.
+
+             ('user_id', '=', uid) is likewise hard-baked, not left to
+             ir.rule: this is the default entry point everyone with basic
+             Sales access opens, and it must only ever show the logged-in
+             user's own orders - even someone who already has broader
+             "see all orders" rights elsewhere in Sales (e.g. a Sales
+             Manager) - unless they're separately granted
+             group_ready_to_invoice_see_all below. -->
+        <field name="domain">[('invoice_status', '=', 'to invoice'), ('delivery_status', '=', 'full'), ('user_id', '=', uid)]</field>
+        <!-- Pre-check the aging filter by default so the first thing you see
+             is the urgent (7+ day) subset, per the domain's note above. -->
+        <field name="context">{'search_default_delivered_not_invoiced_aging': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Nothing fully delivered and still unbilled.
+            </p>
+        </field>
+    </record>
+
+    <record id="sale_order_ready_to_invoice_action_view_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="sale_order_ready_to_invoice_kanban_view"/>
+        <field name="act_window_id" ref="sale_order_ready_to_invoice_action"/>
+    </record>
+
+    <!-- Everyone's pending invoices, not just the logged-in user's own - only
+         for group_ready_to_invoice_see_all, granted explicitly, independent
+         of any other Sales access level. Same underlying kanban view, same
+         hard "pending pipeline" domain, just without the user_id filter. -->
+    <record id="sale_order_ready_to_invoice_all_action" model="ir.actions.act_window">
+        <field name="name">Ready to Invoice - All Salespersons</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="sale.sale_order_view_search_inherit_sale"/>
+        <field name="domain">[('invoice_status', '=', 'to invoice'), ('delivery_status', '=', 'full')]</field>
+        <field name="context">{'group_by': 'user_id', 'search_default_delivered_not_invoiced_aging': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Nothing fully delivered and still unbilled.
+            </p>
+        </field>
+    </record>
+
+    <record id="sale_order_ready_to_invoice_all_action_view_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="sale_order_ready_to_invoice_kanban_view"/>
+        <field name="act_window_id" ref="sale_order_ready_to_invoice_all_action"/>
+    </record>
+
+    <!-- Standalone app (own home-screen icon), not nested inside Sales -
+         the whole point is a one-click destination, not something buried
+         another level deep behind the Sales app's own menu bar. -->
+    <menuitem id="sale_order_ready_to_invoice_menu_root" name="Ready to Invoice"
+              action="sale_order_ready_to_invoice_action"
+              web_icon="sale_ready_to_invoice_dashboard,static/description/icon.png"
+              groups="sales_team.group_sale_salesman" sequence="31"/>
+
+    <menuitem id="sale_order_ready_to_invoice_all_menu" name="All Salespersons"
+              parent="sale_order_ready_to_invoice_menu_root"
+              action="sale_order_ready_to_invoice_all_action"
+              groups="group_ready_to_invoice_see_all" sequence="1"/>
+</odoo>

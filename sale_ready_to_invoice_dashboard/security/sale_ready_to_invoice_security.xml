@@ -1,0 +1,27 @@
+<odoo>
+    <!-- Dedicated to this dashboard only - deliberately NOT tied to
+         sales_team.group_sale_manager/group_sale_salesman_all_leads, so
+         having general "see all orders" rights elsewhere in Sales does not
+         automatically grant visibility into every salesperson's pending
+         invoices here. Must be granted explicitly. -->
+    <record id="group_ready_to_invoice_see_all" model="res.groups">
+        <field name="name">Ready to Invoice: See All Salespersons</field>
+        <field name="comment">Can see every salesperson's orders in the Ready to Invoice dashboard, independent of Sales access level.</field>
+    </record>
+
+    <!-- sale.order's own record rule (sale.sale_order_personal_rule) already
+         restricts a plain "group_sale_salesman" user to their own orders at
+         the ORM level - our action's domain can't override that, only add
+         to it. So actually WIDENING visibility for this new group requires
+         its own ir.rule here, OR'd in alongside the core ones. This does mean
+         a member of this group also sees every order elsewhere in Sales
+         (Quotations, etc.), since ir.rule is model-wide, not per-view - that
+         is the accepted tradeoff for keeping this independent of
+         group_sale_manager. -->
+    <record id="sale_order_ready_to_invoice_rule_see_all" model="ir.rule">
+        <field name="name">Ready to Invoice: See All Salespersons</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_ready_to_invoice_see_all'))]"/>
+    </record>
+</odoo>
