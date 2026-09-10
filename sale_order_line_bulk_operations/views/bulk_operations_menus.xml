@@ -1,0 +1,15 @@
+<odoo>
+    <menuitem id="menu_sale_order_line_bulk_ops"
+              name="Sale Order Lines"
+              parent="sale.sale_order_menu"
+              action="action_sale_order_line_bulk_ops"
+              groups="sale_order_line_bulk_operations.group_bulk_operations_user"
+              sequence="15"/>
+
+    <menuitem id="menu_bulk_operation_history"
+              name="Bulk Operation History"
+              parent="sale.sale_order_menu"
+              action="action_bulk_operation"
+              groups="sale_order_line_bulk_operations.group_bulk_operations_user"
+              sequence="16"/>
+</odoo>

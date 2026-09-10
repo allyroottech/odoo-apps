@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">Sale Order Line Bulk Operations</title>
+  <defs>
+    <linearGradient id="background" x1="28" y1="20" x2="228" y2="236" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1a3ff0"/>
+      <stop offset="1" stop-color="#04124b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="147" y1="142" x2="198" y2="194" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4b6cff"/>
+      <stop offset="1" stop-color="#0a2fd6"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="48" fill="url(#background)"/>
+  <path d="M58 62c0-11.046 8.954-20 20-20h84l36 36v116c0 11.046-8.954 20-20 20H78c-11.046 0-20-8.954-20-20V62Z" fill="#fff"/>
+  <path d="M162 42v24c0 6.627 5.373 12 12 12h24" fill="#d7defe"/>
+  <path d="M88 95h68M88 126h43M88 157h31" fill="none" stroke="#0a2fd6" stroke-linecap="round" stroke-width="13"/>
+  <circle cx="177" cy="154" r="31" fill="url(#accent)"/>
+  <path d="m164 154 9 9 18-20" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/>
+</svg>

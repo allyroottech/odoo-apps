@@ -1,0 +1,9 @@
+<odoo>
+    <record id="seq_sale_order_line_bulk_operation" model="ir.sequence">
+        <field name="name">Sale Order Line Bulk Operation</field>
+        <field name="code">sale.order.line.bulk.operation</field>
+        <field name="prefix">BULK/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>

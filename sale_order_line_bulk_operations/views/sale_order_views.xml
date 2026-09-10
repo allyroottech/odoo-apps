@@ -1,0 +1,25 @@
+<odoo>
+    <record id="view_order_form_inherit_bulk_operations" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.bulk.operations</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" type="object" name="action_view_bulk_operations"
+                        icon="fa-exchange"
+                        invisible="bulk_operation_line_count == 0"
+                        groups="sale_order_line_bulk_operations.group_bulk_operations_user">
+                    <field name="bulk_operation_line_count" widget="statinfo" string="Bulk Updates"/>
+                </button>
+            </xpath>
+            <xpath expr="//header/button[@name='action_preview_sale_order']" position="before">
+                <button string="Bulk Update Lines"
+                        name="action_bulk_update_lines"
+                        type="object"
+                        class="btn btn-secondary"
+                        groups="sale_order_line_bulk_operations.group_bulk_operations_user"
+                        invisible="locked or state not in ('draft', 'sent') or not order_line"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

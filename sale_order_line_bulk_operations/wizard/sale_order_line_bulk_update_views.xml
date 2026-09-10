@@ -1,0 +1,104 @@
+<odoo>
+    <record id="view_sale_order_line_bulk_update_wizard_form" model="ir.ui.view">
+        <field name="name">sale.order.line.bulk.update.wizard.form</field>
+        <field name="model">sale.order.line.bulk.update.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="state" invisible="1"/>
+
+                <group invisible="state != 'select'">
+                    <div class="alert alert-info" role="alert" colspan="2">
+                        <field name="line_count" class="oe_inline"/> Sale Order Line(s) selected across
+                        <field name="order_count" class="oe_inline"/> Sale Order(s).
+                        Remove any lines below you don't want to include.
+                    </div>
+                    <group string="Filters (optional)" colspan="2">
+                        <div class="text-muted" colspan="2">
+                            Narrow down which lines below will be updated - click "New Rule", then pick a field,
+                            a condition and a value. Add more rules to combine them.
+                        </div>
+                        <field name="line_filter_domain" widget="domain" nolabel="1" colspan="2"
+                               options="{'model': 'sale.order.line.bulk.filter.fields', 'in_dialog': true}"/>
+                        <div colspan="2">
+                            <button name="action_apply_filters" string="Apply Filters"
+                                    type="object" class="btn-primary"/>
+                            <button name="action_reset_filters" string="Reset Filters"
+                                    type="object" class="btn-secondary"
+                                    invisible="not line_filter_domain or line_filter_domain == '[]'"/>
+                        </div>
+                    </group>
+                    <field name="line_ids" nolabel="1" colspan="2" options="{'link': False}">
+                        <list edit="false" create="false">
+                            <field name="order_id"/>
+                            <field name="product_id"/>
+                            <field name="categ_id" string="Category"/>
+                            <field name="name" string="Description"/>
+                            <field name="price_unit"/>
+                            <field name="discount"/>
+                            <field name="product_uom_qty" string="Qty"/>
+                        </list>
+                    </field>
+
+                    <group string="Update" colspan="2">
+                        <div class="d-flex align-items-center flex-wrap gap-2" colspan="2">
+                            <span>Change</span>
+                            <field name="field_name" nolabel="1" class="oe_inline"/>
+
+                            <field name="price_operation_type" invisible="field_name != 'price_unit'" nolabel="1" class="oe_inline"/>
+                            <field name="discount_operation_type" invisible="field_name != 'discount'" nolabel="1" class="oe_inline"/>
+                            <field name="quantity_operation_type" invisible="field_name != 'product_uom_qty'" nolabel="1" class="oe_inline"/>
+                            <field name="description_operation_type" invisible="field_name != 'name'" nolabel="1" class="oe_inline"/>
+
+                            <field name="price_value" invisible="field_name != 'price_unit'" nolabel="1" class="oe_inline" style="width: 100px"/>
+                            <field name="discount_value" invisible="field_name != 'discount'" nolabel="1" class="oe_inline" style="width: 100px"/>
+                            <field name="quantity_value" invisible="field_name != 'product_uom_qty'" nolabel="1" class="oe_inline" style="width: 100px"/>
+                            <field name="description_value" invisible="field_name != 'name'" nolabel="1" class="oe_inline"
+                                   style="width: 220px" placeholder="Type the text here..."/>
+                        </div>
+                    </group>
+                </group>
+
+                <group invisible="state != 'preview'">
+                    <div class="alert alert-success" role="alert" colspan="2">
+                        <field name="eligible_line_count" class="oe_inline"/> line(s) can be updated,
+                        <field name="skipped_line_count" class="oe_inline"/> line(s) cannot be updated.
+                    </div>
+                    <div class="alert alert-warning" role="alert" colspan="2" invisible="not warning_message">
+                        <field name="warning_message" class="oe_inline" nolabel="1"/>
+                    </div>
+                    <div class="text-muted" colspan="2" invisible="preview_more_count == 0">
+                        <field name="preview_more_count" class="oe_inline"/> additional line(s) are not listed below to keep this preview fast; the totals above already cover every selected line.
+                    </div>
+                    <field name="preview_line_ids" nolabel="1" colspan="2">
+                        <list create="false" delete="false" decoration-muted="not can_apply">
+                            <field name="can_apply" column_invisible="1"/>
+                            <field name="order_id"/>
+                            <field name="sale_order_line_id"/>
+                            <field name="old_value_numeric" string="Current Value" column_invisible="parent.field_name == 'name'"/>
+                            <field name="new_value_numeric" string="New Value" column_invisible="parent.field_name == 'name'"/>
+                            <field name="old_value_text" string="Current Text" column_invisible="parent.field_name != 'name'"/>
+                            <field name="new_value_text" string="New Text" column_invisible="parent.field_name != 'name'"/>
+                            <field name="skip_reason"/>
+                        </list>
+                    </field>
+                </group>
+
+                <footer>
+                    <button name="action_preview" string="Preview" type="object" class="btn-primary" invisible="state != 'select'"/>
+                    <button name="action_apply" string="Apply Changes" type="object" class="btn-primary"
+                            invisible="state != 'preview'"
+                            confirm="This will update the eligible Sale Order Lines. Continue?"/>
+                    <button name="action_back" string="Back" type="object" invisible="state != 'preview'"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sale_order_line_bulk_update_wizard" model="ir.actions.act_window">
+        <field name="name">Update Multiple Lines</field>
+        <field name="res_model">sale.order.line.bulk.update.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

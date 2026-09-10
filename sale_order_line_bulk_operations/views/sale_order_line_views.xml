@@ -1,0 +1,75 @@
+<odoo>
+    <record id="view_sale_order_line_bulk_ops_search" model="ir.ui.view">
+        <field name="name">sale.order.line.bulk.ops.search</field>
+        <field name="model">sale.order.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="order_id"/>
+                <field name="order_partner_id" string="Customer"/>
+                <field name="product_id"/>
+                <field name="categ_id" string="Product Category"/>
+                <field name="name" string="Description"/>
+                <field name="salesman_id"/>
+                <separator/>
+                <filter name="filter_quotation" string="Quotation" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_sent" string="Quotation Sent" domain="[('state', '=', 'sent')]"/>
+                <filter name="filter_confirmed" string="Sales Order" domain="[('state', '=', 'sale')]"/>
+                <filter name="filter_cancelled" string="Cancelled" domain="[('state', '=', 'cancel')]"/>
+                <separator/>
+                <filter name="filter_no_discount" string="No Discount" domain="[('discount', '=', 0)]"/>
+                <filter name="filter_locked" string="Locked Order" domain="[('order_id.locked', '=', True)]"/>
+                <group>
+                    <filter name="group_by_order" string="Sale Order" context="{'group_by': 'order_id'}"/>
+                    <filter name="group_by_product" string="Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_by_category" string="Product Category" context="{'group_by': 'categ_id'}"/>
+                    <filter name="group_by_state" string="Order Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_by_partner" string="Customer" context="{'group_by': 'order_partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_sale_order_line_bulk_ops_list" model="ir.ui.view">
+        <field name="name">sale.order.line.bulk.ops.list</field>
+        <field name="model">sale.order.line</field>
+        <field name="arch" type="xml">
+            <list string="Sale Order Lines" create="false" delete="false">
+                <header>
+                    <button name="%(action_sale_order_line_bulk_update_wizard)d" type="action"
+                            string="Bulk Update Lines" class="btn-primary" display="always"
+                            groups="sale_order_line_bulk_operations.group_bulk_operations_user"/>
+                </header>
+                <field name="order_id"/>
+                <field name="order_partner_id" string="Customer"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'sent'"
+                       decoration-success="state == 'sale'"
+                       decoration-muted="state == 'cancel'"/>
+                <field name="product_id"/>
+                <field name="categ_id" string="Category" optional="hide"/>
+                <field name="name" string="Description"/>
+                <field name="product_uom_qty" sum="Total Qty"/>
+                <field name="price_unit"/>
+                <field name="discount"/>
+                <field name="price_subtotal" sum="Total"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="company_id" optional="hide" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_sale_order_line_bulk_ops" model="ir.actions.act_window">
+        <field name="name">Sale Order Lines</field>
+        <field name="res_model">sale.order.line</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_sale_order_line_bulk_ops_list"/>
+        <field name="search_view_id" ref="view_sale_order_line_bulk_ops_search"/>
+        <field name="domain">[('display_type', '=', False)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Sale Order Lines found for the current filters.
+            </p>
+        </field>
+    </record>
+</odoo>
