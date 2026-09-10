@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="preview_page" name="Attachment Preview Page">&lt;!DOCTYPE html&gt;
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title><t t-esc="name"/> — Preview</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            background: #f7f7f5;
+            color: #1f2933;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        .o_cap_shell {
+            box-sizing: border-box;
+            min-height: 100%;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .o_cap_view {
+            width: 100%;
+            height: calc(100vh - 32px);
+            border: 0;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 8px 28px rgba(15, 23, 42, 0.14);
+        }
+        img.o_cap_view {
+            object-fit: contain;
+            box-shadow: none;
+            background: transparent;
+        }
+        .o_cap_notice {
+            max-width: 540px;
+            padding: 28px;
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 8px 28px rgba(15, 23, 42, 0.14);
+            text-align: center;
+        }
+        .o_cap_notice h2 { margin: 0 0 10px; font-size: 20px; }
+        .o_cap_notice p  { margin: 0 0 18px; color: #52606d; }
+        .o_cap_notice a  {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 8px;
+            background: #1f2933;
+            color: white;
+            text-decoration: none;
+        }
+        .o_cap_sheet {
+            box-sizing: border-box;
+            width: 100%;
+            height: calc(100vh - 32px);
+            overflow: hidden;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 8px 28px rgba(15, 23, 42, 0.14);
+            display: flex;
+            flex-direction: column;
+        }
+        .o_cap_sheet_header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #fafaf9;
+        }
+        .o_cap_sheet_header h1 { margin: 0; font-size: 17px; }
+        .o_cap_sheet_header p  { margin: 3px 0 0; color: #6b7280; }
+        .o_cap_sheet_header span, .o_cap_sheet_note { color: #6b7280; font-size: 13px; }
+        .o_cap_sheet_note {
+            padding: 8px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #fff7ed;
+        }
+        .o_cap_sheet_table_wrap { overflow: auto; flex: 1; }
+        .o_cap_sheet_table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: max-content;
+            min-width: 100%;
+            font-size: 13px;
+        }
+        .o_cap_sheet_table th,
+        .o_cap_sheet_table td {
+            max-width: 360px;
+            min-width: 90px;
+            padding: 6px 8px;
+            border-right: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: top;
+        }
+        .o_cap_sheet_table th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #f3f4f6;
+            color: #4b5563;
+            font-weight: 600;
+            text-align: left;
+        }
+        .o_cap_sheet_table .o_cap_row_header {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            min-width: 44px;
+            width: 44px;
+            background: #f3f4f6;
+            text-align: right;
+        }
+        /* ── ZIP ── */
+        .o_cap_zip_wrap {
+            box-sizing: border-box;
+            width: 100%;
+            height: calc(100vh - 32px);
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 8px 28px rgba(15, 23, 42, 0.14);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .o_cap_zip_header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #fafaf9;
+            flex-shrink: 0;
+        }
+        .o_cap_zip_header strong { color: #1f2933; font-size: 15px; }
+        .o_cap_zip_header .o_cap_zip_meta { color: #6b7280; font-size: 13px; margin-top: 2px; }
+        .o_cap_zip_note {
+            padding: 8px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #fff7ed;
+            color: #92400e;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        .o_cap_zip_list {
+            flex: 1;
+            overflow: auto;
+            font-size: 13px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+        .o_cap_zip_entry {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            padding: 4px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            line-height: 1.5;
+        }
+        .o_cap_zip_entry:hover { background: #f9fafb; }
+        .o_cap_zip_dir { color: #2563eb; }
+        .o_cap_zip_icon { flex-shrink: 0; width: 16px; text-align: center; }
+        .o_cap_zip_name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #1f2933; }
+        .o_cap_zip_dir .o_cap_zip_name { color: #1d4ed8; font-weight: 500; }
+        .o_cap_zip_size { color: #9ca3af; min-width: 72px; text-align: right; flex-shrink: 0; }
+        .o_cap_zip_date { color: #9ca3af; min-width: 82px; text-align: right; flex-shrink: 0; }
+        a.o_cap_zip_name { color: #1f2933; text-decoration: none; }
+        a.o_cap_zip_name:hover { color: #2563eb; text-decoration: underline; }
+        /* ── Text / Code viewer ── */
+        .o_cap_text_wrap {
+            box-sizing: border-box;
+            width: 100%;
+            height: calc(100vh - 32px);
+            border-radius: 12px;
+            background: #1e2330;
+            box-shadow: 0 8px 28px rgba(15, 23, 42, 0.14);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .o_cap_text_header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #161b27;
+            border-bottom: 1px solid #2d3748;
+            flex-shrink: 0;
+        }
+        .o_cap_text_back {
+            color: #93c5fd;
+            text-decoration: none;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        .o_cap_text_back:hover { text-decoration: underline; }
+        .o_cap_text_filename {
+            color: #e2e8f0;
+            font-size: 14px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .o_cap_text_body {
+            flex: 1;
+            overflow: auto;
+            padding: 0;
+        }
+        .o_cap_text_body pre {
+            margin: 0;
+            padding: 20px 24px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #e2e8f0;
+            white-space: pre;
+            tab-size: 4;
+        }
+        /* ── Markdown ── */
+        .o_cap_md_wrap {
+            box-sizing: border-box;
+            width: 100%;
+            height: calc(100vh - 32px);
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 8px 28px rgba(15, 23, 42, 0.14);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .o_cap_md_header {
+            padding: 14px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #fafaf9;
+            font-size: 14px;
+            color: #6b7280;
+            flex-shrink: 0;
+        }
+        .o_cap_md_header strong { color: #1f2933; }
+        .o_cap_md_body {
+            flex: 1;
+            overflow: auto;
+            padding: 28px 36px;
+            max-width: 860px;
+            width: 100%;
+            margin: 0 auto;
+            font-size: 15px;
+            line-height: 1.7;
+            color: #1f2933;
+        }
+        .o_cap_md_body h1, .o_cap_md_body h2, .o_cap_md_body h3,
+        .o_cap_md_body h4, .o_cap_md_body h5, .o_cap_md_body h6 {
+            margin: 1.4em 0 0.4em;
+            font-weight: 600;
+            line-height: 1.3;
+            color: #111827;
+        }
+        .o_cap_md_body h1 { font-size: 1.8em; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; }
+        .o_cap_md_body h2 { font-size: 1.35em; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; }
+        .o_cap_md_body h3 { font-size: 1.15em; }
+        .o_cap_md_body p  { margin: 0 0 1em; }
+        .o_cap_md_body ul, .o_cap_md_body ol { margin: 0 0 1em 1.5em; padding: 0; }
+        .o_cap_md_body li { margin-bottom: 4px; }
+        .o_cap_md_body blockquote {
+            margin: 0 0 1em;
+            padding: 10px 16px;
+            border-left: 4px solid #d1d5db;
+            background: #f9fafb;
+            color: #52606d;
+            border-radius: 0 6px 6px 0;
+        }
+        .o_cap_md_body hr { border: 0; border-top: 1px solid #e5e7eb; margin: 1.5em 0; }
+        .o_cap_md_body a  { color: #2563eb; text-decoration: underline; }
+        .o_cap_md_body code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.875em;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 1px 5px;
+        }
+        .o_cap_md_body pre {
+            background: #1e2330;
+            border-radius: 8px;
+            padding: 16px 20px;
+            overflow-x: auto;
+            margin: 0 0 1em;
+        }
+        .o_cap_md_body pre code {
+            background: transparent;
+            border: 0;
+            padding: 0;
+            font-size: 0.85em;
+            color: #e2e8f0;
+        }
+        .o_cap_md_body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 0 1em;
+            font-size: 0.9em;
+        }
+        .o_cap_md_body th, .o_cap_md_body td {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            text-align: left;
+        }
+        .o_cap_md_body th { background: #f3f4f6; font-weight: 600; }
+        .o_cap_md_body tr:nth-child(even) td { background: #f9fafb; }
+    </style>
+</head>
+<body>
+<div class="o_cap_shell">
+
+    <t t-if="preview_type == 'image'">
+        <img class="o_cap_view" t-att-src="image_url" t-att-alt="name"/>
+    </t>
+
+    <t t-elif="preview_type == 'video'">
+        <video class="o_cap_view" controls="" t-att-src="content_url"/>
+    </t>
+
+    <t t-elif="preview_type == 'audio'">
+        <audio class="o_cap_view" controls="" t-att-src="content_url"/>
+    </t>
+
+    <t t-elif="preview_type == 'pdf'">
+        <iframe class="o_cap_view" t-att-src="pdf_viewer_url"/>
+    </t>
+
+    <t t-elif="preview_type == 'office'">
+        <iframe class="o_cap_view" t-att-src="converted_url"/>
+    </t>
+
+    <t t-elif="preview_type == 'spreadsheet'">
+        <div class="o_cap_sheet">
+            <div class="o_cap_sheet_header">
+                <div>
+                    <h1><t t-esc="name"/></h1>
+                    <p>Showing <t t-esc="sheet_name"/></p>
+                </div>
+                <span><t t-esc="row_count"/> rows × <t t-esc="col_count"/> columns</span>
+            </div>
+            <div t-if="truncated" class="o_cap_sheet_note">
+                Preview limited to first <t t-esc="max_rows"/> rows and <t t-esc="max_cols"/> columns.
+            </div>
+            <div t-if="not rows" class="o_cap_notice" style="margin: auto;">
+                <h2>No data found in this spreadsheet</h2>
+            </div>
+            <div t-else="" class="o_cap_sheet_table_wrap">
+                <table class="o_cap_sheet_table">
+                    <thead>
+                        <tr>
+                            <t t-foreach="col_headers" t-as="header">
+                                <th><t t-esc="header"/></th>
+                            </t>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="rows" t-as="row">
+                            <tr>
+                                <th class="o_cap_row_header"><t t-esc="row_index + 1"/></th>
+                                <t t-foreach="row" t-as="cell">
+                                    <td><t t-esc="cell"/></td>
+                                </t>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </t>
+
+    <t t-elif="preview_type == 'text'">
+        <div class="o_cap_text_wrap">
+            <div class="o_cap_text_header">
+                <t t-if="back_url">
+                    <a t-att-href="back_url" class="o_cap_text_back">← Back</a>
+                </t>
+                <span class="o_cap_text_filename"><t t-esc="name"/></span>
+            </div>
+            <div class="o_cap_text_body">
+                <pre id="o-cap-text-body"> </pre>
+            </div>
+        </div>
+        <script type="application/json" id="o-cap-text-src"><t t-out="text_json"/></script>
+        <script>
+            (function () {
+                var src = JSON.parse(document.getElementById('o-cap-text-src').textContent);
+                document.getElementById('o-cap-text-body').textContent = src;
+            }());
+        </script>
+    </t>
+
+    <t t-elif="preview_type == 'zip'">
+        <div class="o_cap_zip_wrap">
+            <div class="o_cap_zip_header">
+                <div>
+                    <strong><t t-esc="name"/></strong>
+                    <div class="o_cap_zip_meta">
+                        <t t-esc="zip_count"/> file(s)<t t-if="zip_dir_count">, <t t-esc="zip_dir_count"/> folder(s)</t>
+                    </div>
+                </div>
+            </div>
+            <t t-if="zip_truncated">
+                <div class="o_cap_zip_note">
+                    Showing first <t t-esc="zip_max"/> entries.
+                </div>
+            </t>
+            <div class="o_cap_zip_list">
+                <t t-foreach="zip_entries" t-as="entry">
+                    <div t-attf-class="o_cap_zip_entry #{entry['is_dir'] and 'o_cap_zip_dir' or ''}"
+                         t-attf-style="padding-left: #{16 + entry['depth'] * 20}px">
+                        <span class="o_cap_zip_icon"><t t-if="entry['is_dir']">📁</t><t t-else="">📄</t></span>
+                        <t t-if="entry['is_dir']">
+                            <span class="o_cap_zip_name"><t t-esc="entry['basename']"/></span>
+                        </t>
+                        <t t-else="">
+                            <a t-att-href="entry['entry_url']" class="o_cap_zip_name"><t t-esc="entry['basename']"/></a>
+                        </t>
+                        <span class="o_cap_zip_size"><t t-esc="entry['size']"/></span>
+                        <span class="o_cap_zip_date"><t t-esc="entry['date']"/></span>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </t>
+
+    <t t-elif="preview_type == 'markdown'">
+        <div class="o_cap_md_wrap">
+            <div class="o_cap_md_header">
+                <strong><t t-esc="name"/></strong>
+            </div>
+            <div id="o-cap-md-body" class="o_cap_md_body"> </div>
+            <script type="application/json" id="o-cap-md-src"><t t-out="markdown_json"/></script>
+            <script src="/chatter_attachment_preview/static/src/markdown/markdown_renderer.js"> </script>
+        </div>
+    </t>
+
+    <t t-else="">
+        <div class="o_cap_notice">
+            <h2><t t-esc="notice_title"/></h2>
+            <p><t t-esc="notice_body"/></p>
+            <a t-att-href="download_url">Download file</a>
+        </div>
+    </t>
+
+</div>
+</body>
+</html>
+    </template>
+</odoo>

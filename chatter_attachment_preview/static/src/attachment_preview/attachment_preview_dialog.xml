@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="chatter_attachment_preview.AttachmentPreviewDialog">
+        <Dialog title="title" size="'xl'" bodyClass="'o-cap-PreviewDialog-body'" contentClass="'o-cap-PreviewDialog'" withBodyPadding="false">
+            <iframe class="o-cap-PreviewDialog-frame" t-att-src="previewUrl"/>
+            <t t-set-slot="footer">
+                <a class="btn btn-secondary" t-att-href="downloadUrl" download="">
+                    <i class="fa fa-download me-1"/>
+                    <span>Download</span>
+                </a>
+                <button class="btn btn-primary" t-on-click="props.close">Close</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>
